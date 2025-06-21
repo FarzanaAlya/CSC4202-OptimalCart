@@ -1,6 +1,7 @@
 # CSC4202-OptimalCart
 
 Problem Scenario
+
 Title: Optimising Voucher Discounts at a Modern Supermarket Checkout
 In Kuala Lumpur, Malaysia, a well-known urban supermarket chain, CityMart, has embraced digital transformation by enabling customers to use digital vouchers at self-checkout kiosks and mobile app-assisted counters. These vouchers offer targeted discounts such as RM5 off with a minimum spend on bakery items or 10% off selected dairy products but they come with strict usage conditions and limitations on combinations.
 
