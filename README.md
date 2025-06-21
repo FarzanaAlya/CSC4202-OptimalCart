@@ -9,13 +9,11 @@ Customers often collect multiple vouchers, but not all vouchers can be used toge
 
 At checkout, many customers try vouchers one at a time, which leads to missed discounts and frustration. Meanwhile, the supermarket sometimes loses revenue because vouchers are misused or applied incorrectly. The slow, manual process also causes longer wait times and a poor shopping experience.
 
-This situation is causing customer dissatisfaction and lost revenue, a serious challenge for CityMart. The goal is to develop an efficient system that automatically finds the best combination of valid vouchers for each shopping cart, ensuring customers get the maximum savings while protecting the store’s profit
+This situation is causing customer dissatisfaction and lost revenue, a serious challenge for CityMart. The goal is to develop an efficient system that automatically finds the best combination of valid vouchers for each shopping cart, ensuring customers get the maximum savings while protecting the store’s profit.
 
-CSC4204 GROUP PROJECT
 
-Dear all,
 
-Here is the rubric for a group project as a guideline for you to prepare for final report and presentation.
+**CSC4204 GROUP PROJECT**
 
 Presentation for group project will be held as below:
 
@@ -37,4 +35,3 @@ Content of the presentation:
 
 •⁠  ⁠Conclusion - farzana
 
-Thank you
