@@ -135,7 +135,15 @@ public class VoucherOptimiser {
             System.out.printf("✓ Added: %s x%d = RM %.2f\n\n", selected.name, qty, selected.price * qty);
         }
 
+        long startDP = System.nanoTime();
         optimize(cart, vouchers);
+        long endDP = System.nanoTime();
+        System.out.printf("DP Time: %.3f ms\n", (endDP - startDP) / 1e6);
+
+        long startGreedy = System.nanoTime();
+        greedyOptimize(cart, vouchers);
+        long endGreedy = System.nanoTime();
+        System.out.printf("Greedy Time: %.3f ms\n", (endGreedy - startGreedy) / 1e6);
     }
 
     public static void optimize(List<Item> cart, List<Voucher> vouchers) {
@@ -177,9 +185,8 @@ public class VoucherOptimiser {
             }
         }
 
-        // RECEIPT
         System.out.println("\n===============================================");
-        System.out.println("\t\t\t    RECEIPT ");
+        System.out.println("\t\t\t    DP RECEIPT ");
         System.out.println("===============================================");
         String txnID = "TXN" + LocalDate.now().toString().replace("-", "") + "001";
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -195,6 +202,7 @@ public class VoucherOptimiser {
         for (String v : bestCombo) {
             System.out.printf("✓ %s\n", v);
         }
+        System.out.printf("Total Vouchers Used: %d\n", bestCombo.size());
 
         System.out.println("\n-----------------------------------------------");
         System.out.printf("SUBTOTAL:        RM %.2f\n", subtotal);
@@ -202,14 +210,62 @@ public class VoucherOptimiser {
         System.out.printf("TOTAL TO PAY:    RM %.2f\n", subtotal - bestDiscount);
         System.out.printf("YOU SAVED:       RM %.2f (%.2f%%)\n", bestDiscount, (bestDiscount / subtotal) * 100);
         System.out.println("===============================================");
-
-        // Optional complexity print (dev only)
-        boolean showComplexityToCustomer = false;
-        if (showComplexityToCustomer) {
-            System.out.printf("\nTime Complexity: O(n * 2^n) for n = %d vouchers\n", n);
-            System.out.printf("Space Complexity: O(2^n)\n");
-        } else {
-            System.err.printf("[DEV] Time Complexity: O(n * 2^n), Space: O(2^n) for n = %d\n", n);
-        }
     }
+
+    public static void greedyOptimize(List<Item> cart, List<Voucher> vouchers) {
+        double subtotal = cart.stream().mapToDouble(i -> i.price * i.quantity).sum();
+        Set<String> selected = new HashSet<>();
+        double totalDiscount = 0;
+        List<String> appliedVouchers = new ArrayList<>();
+
+        List<Voucher> sorted = new ArrayList<>(vouchers);
+        sorted.sort((a, b) -> Double.compare(b.discount, a.discount)); // descending
+
+        for (Voucher v : sorted) {
+            if (!v.isApplicable(cart, subtotal)) continue;
+            if (!v.isCompatible(selected)) continue;
+            if (v.exclusive && !selected.isEmpty()) continue;
+
+            boolean exclusiveInCart = selected.stream().anyMatch(name -> {
+                for (Voucher existing : vouchers) {
+                    if (existing.name.equals(name) && existing.exclusive) return true;
+                }
+                return false;
+            });
+
+            if (!v.exclusive && exclusiveInCart) continue;
+
+            selected.add(v.name);
+            appliedVouchers.add(v.name);
+            totalDiscount += v.discount;
+        }
+
+        // RECEIPT (formatted like DP)
+        System.out.println("\n===============================================");
+        System.out.println("\t\t\tGREEDY RECEIPT ");
+        System.out.println("===============================================");
+        String txnID = "TXN" + LocalDate.now().toString().replace("-", "") + "002";
+        String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"));
+
+        System.out.printf("Transaction ID: %s\nDate: %s\nTime: %s\n\n", txnID, date, time);
+        System.out.println("ITEMS PURCHASED:");
+        for (Item i : cart) {
+            System.out.printf("- %s x%d @ RM %.2f = RM %.2f\n", i.name, i.quantity, i.price, i.price * i.quantity);
+        }
+
+        System.out.println("\nVOUCHERS APPLIED:");
+        for (String v : appliedVouchers) {
+            System.out.printf("✓ %s\n", v);
+        }
+        System.out.printf("Total Vouchers Used: %d\n", appliedVouchers.size());
+
+        System.out.println("\n-----------------------------------------------");
+        System.out.printf("SUBTOTAL:        RM %.2f\n", subtotal);
+        System.out.printf("DISCOUNT:       -RM %.2f\n", totalDiscount);
+        System.out.printf("TOTAL TO PAY:    RM %.2f\n", subtotal - totalDiscount);
+        System.out.printf("YOU SAVED:       RM %.2f (%.2f%%)\n", totalDiscount, (totalDiscount / subtotal) * 100);
+        System.out.println("===============================================");
+    }
+
 }
